@@ -14,3 +14,27 @@ export const App = defineComponent({
 });
 
 
+import { defineComponent, h } from "@vue/runtime-core";
+import { ref } from "@vue/reactivity";
+import { getCalendarByRoute } from "./external_service/backend";
+
+export const App = defineComponent({
+  // async setup() {
+  //     const routeName = await getCalendarByRoute("ALA-NQZ")
+  //     const routeData = ref(routeName)
+  //     console.log(routeData.value)
+  //     return () => (
+  //         <div>dsa{routeData.value}</div>
+  //     )
+  // }
+  methods: {
+    getData(){
+      let routeData: Object = {}
+      getCalendarByRoute("ALA-NQZ").then((res) => routeData = ref(res))
+      return routeData
+    }
+  },
+  render() {
+    return <div>dasdsa {this.getData()} dasd</div>
+  }
+});
