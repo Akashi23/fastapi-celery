@@ -11,6 +11,8 @@ fastapi = "^0.60.1"
 hypercorn = "^0.10.2"
 celery = "^4.4.6"
 redis = "^3.5.3"
+requests = "^2.26.0"
+black = "^21.9b0"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.8.3"

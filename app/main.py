@@ -1,35 +1,47 @@
 import os
 import logging
-from threading import Thread
 
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from worker.celery_app import celery_app
+from config import REDIS_STORE
+from redis import Redis
+import json
 
 log = logging.getLogger(__name__)
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-def celery_on_message(body):
-    log.warn(body)
+redis_instance = Redis.from_url(REDIS_STORE)
 
-def background_on_message(task):
-    log.warn(task.get(on_message=celery_on_message, propagate=False))
+# @app.on_event("startup")
+# async def startup_event():
+#     task_name = None
+#     # set correct task name based on the way you run the example
+#     if not bool(os.getenv('DOCKER')):
+#         task_name = "app.worker.celery_worker.test_celery"
+#     else:
+#         task_name = "app.app.worker.celery_worker.test_celery"
+
+#     task = celery_app.send_task(task_name)
+#     log.info(f"HHH {task}")
 
 
-@app.get("/{word}")
-async def root(word: str, background_task: BackgroundTasks):
-    task_name = None
-
-    # set correct task name based on the way you run the example
-    if not bool(os.getenv('DOCKER')):
-        task_name = "app.worker.celery_worker.test_celery"
-    else:
-        task_name = "app.app.worker.celery_worker.test_celery"
-
-    task = celery_app.send_task(task_name, args=[word])
-    print(task)
-    background_task.add_task(background_on_message, task)
-
-    return {"message": "Word received"}
+@app.get("/{route}")
+async def root(route: str, request: Request):
+    try:
+        calendar: dict = json.loads(redis_instance.get(route))
+    except ValueError as e:
+        log.warning(e)
+        raise HTTPException(status_code=404, detail="Route not found")
+    log.info("Successful received! route:{route}, ip-addr: {request.client.host}")
+    return {route: calendar}
