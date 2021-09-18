@@ -23,6 +23,8 @@ app.add_middleware(
 
 redis_instance = Redis.from_url(REDIS_STORE)
 
+#For testing
+
 # @app.on_event("startup")
 # async def startup_event():
 #     task_name = None
@@ -37,11 +39,12 @@ redis_instance = Redis.from_url(REDIS_STORE)
 
 
 @app.get("/{route}")
-async def root(route: str, request: Request):
+async def root(route: str):
+    """Use Route for getting data about flight price"""
     try:
         calendar: dict = json.loads(redis_instance.get(route))
     except ValueError as e:
         log.warning(e)
         raise HTTPException(status_code=404, detail="Route not found")
-    log.info("Successful received! route:{route}, ip-addr: {request.client.host}")
-    return {route: calendar}
+    log.info("Successful received! route:{route}")
+    return calendar

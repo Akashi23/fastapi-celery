@@ -1,6 +1,6 @@
 FROM python:3.7-slim
 
-LABEL maintainer="Grega Vrbančič <grega.vrbancic@gmail.com"
+LABEL maintainer="Daniar <dan.zh.1999@gmail.com>"
 
 ENV DOCKER=true
 

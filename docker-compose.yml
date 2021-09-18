@@ -58,6 +58,11 @@ services:
       - "./:/app"
     command: "poetry run celery worker -A app.app.worker.celery_worker -l info -Q test-queue -c 1 -B"
 
+  front:
+    build: ./front
+    ports:
+      - "8080:80"
+
 volumes:
   rabbitmq_data:
     driver: local

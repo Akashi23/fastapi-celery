@@ -1,26 +1,30 @@
 <template>
-  <div>
-    <select v-model="currentRoute">
-    <option v-for="(route, index) in routes" :key="index" @click="setRoute(route)">{{route}}</option>
+  <div class="container">
+    <select v-model="currentRoute" @change="setRoute()">
+      <option v-for="(route, index) in routes" :key="index">{{ route }}</option>
     </select>
-    <div v-for="(r, jndex) in routeData[currentRoute]" :key="jndex">{{r}}</div>
-    {{currentRoute}}
+    <div class="card-body d-flex justify-content-around">
+        <span>Дата</span>
+        <span>Цена</span>
+      </div>
+    <div class="card" v-for="(r, jndex) in routeData" :key="jndex">
+      <div class="card-body row">
+        <span class="col-sm">{{ r.date }}</span>
+        <span class="col-sm">{{ r.minPrice || "Не объявлено" }} Тенге</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { getCalendarByRoute } from "./external_service/backend";
-// import Calendar from "./Calendar.vue"
 
 export default defineComponent({
   name: "App",
-  components: {
-    // Calendar
-  },
   data() {
     return {
-      routeData: undefined,
+      routeData: [],
       routes: [
         "ALA-NQZ",
         "NQZ-ALA",
@@ -31,7 +35,7 @@ export default defineComponent({
         "NQZ-VKO",
         "VKO-NQZ",
         "NQZ-LED",
-        "LED-NQZ"
+        "LED-NQZ",
       ],
       currentRoute: "ALA-NQZ",
     };
@@ -40,13 +44,12 @@ export default defineComponent({
     this.getData();
   },
   methods: {
-    setRoute(){
-      this.getData().then((res)=> console.log(res))
+    setRoute() {
+      this.getData().then((res) => console.log(res));
     },
     async getData() {
-      let routeData = await getCalendarByRoute(this.currentRoute);
-      this.routeData = routeData;
-      console.log(routeData);
+      this.routeData = await getCalendarByRoute(this.currentRoute);
+      console.log(this.routeData);
     },
   },
 });
